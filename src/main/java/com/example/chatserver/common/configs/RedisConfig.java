@@ -4,6 +4,7 @@ import com.example.chatserver.chat.service.RedisPubSubService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
@@ -26,13 +27,14 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
  *  - RedisMessageListenerContainer로 Subscribe 기능 구성
  *  - MessageListenerAdapter로 수신 메시지 처리 메서드 지정
  */
+@Configuration
 public class RedisConfig {
 
     // application.yml에서 Redis 접속정보 주입
-    @Value("${spring.redis.host}")
+    @Value("${spring.data.redis.host}")
     private String host;
 
-    @Value("${spring.redis.port}")
+    @Value("${spring.data.redis.port}")
     private int port;
 
     /**
@@ -45,7 +47,7 @@ public class RedisConfig {
      */
     @Bean
     @Qualifier("chatPubSub")
-    public RedisConnection chatPubSubFactory() {
+    public RedisConnectionFactory chatPubSubFactory() {
         RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
         configuration.setHostName(host);
         configuration.setPort(port);
@@ -54,7 +56,7 @@ public class RedisConfig {
         // configuration.setDatabase(0);
 
         // Lettuce는 비동기 I/O 기반의 Redis 클라이언트로, Spring Boot의 기본 Redis 클라이언트이다.
-        return new LettuceConnectionFactory(configuration).getConnection();
+        return new LettuceConnectionFactory(configuration);
     }
 
     /**
